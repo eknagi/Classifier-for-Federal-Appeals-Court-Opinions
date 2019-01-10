@@ -5,7 +5,7 @@ library(tm)
 library(tidytext)
 library(ROCR)
 
-#A)
+
 
 #Reading in the recent_opinions.tsv:
 appeals.data <- read_tsv("recent_opinions.tsv")
@@ -29,7 +29,7 @@ custom_stop_words= rbind(stop_words, custom_words)
 
 
 
-#B)a) Unnesting the tokens in appeals.data:
+#Unnesting the tokens in appeals.data:
 text_appeals.data <-appeals.data %>% unnest_tokens(word, text)
 
 
@@ -43,7 +43,7 @@ text_appeals.data %>% count(word) %>% arrange(desc(n)) %>% slice(1:10)
 text_appeals.data %>% group_by (circuit) %>% count(word) %>% arrange(desc(n)) %>% slice(1:10)
 
 
-# B)b)
+
 
 #Finding the 100 most common words that are not stop words:
 hundred.most.common=text_appeals.data %>% count(word) %>% arrange(desc(n)) %>% slice(1:100)
@@ -84,7 +84,6 @@ train <- final %>% slice(1:split_size)
 test <- final %>% slice(split_size+1:n())
 
 
-# B)c)
 
 # fit circuit as a function of all other predictors
 model <- glm(circuit ~., data = train, family = "binomial")
@@ -100,8 +99,6 @@ cat("the auc score is", 100*perf@y.values[[1]], "\n")
 # cut-off point where all the texts before that belong to one circuit and all following texts belong to another
 
 
-
-# B)d)
 
 # drop opinion_id
 final <- final %>% select(-opinion_id) %>%  slice(sample(1:n()))
@@ -127,10 +124,6 @@ tail(coeff)
 
 
 
-## C)
-
-# C)a)
-
 bigram_data <-appeals.data %>% unnest_tokens(word, text, token = "ngrams", n =2)
 
 # remove bigrams that contain stop words
@@ -150,7 +143,7 @@ bigram_clean %>% count(word) %>% arrange(desc(n)) %>% slice(1:10)
 bigram_clean %>% group_by (circuit) %>% count(word) %>% arrange(desc(n)) %>% slice(1:10)
 
 
-#C)b)
+
 
 #Finding the 100 most common bigrams that are not stop words:
 hundred.most.common=bigram_clean %>% count(word) %>% arrange(desc(n)) %>% slice(1:100)
@@ -180,9 +173,6 @@ circuit == "ninth" ~0
 
 
 
-
-# C)d)
-
 # drop opinion_id
 final <- final %>% select(-opinion_id) %>%  slice(sample(1:n()))
 split_size = floor(nrow(final)/2)
@@ -203,12 +193,6 @@ arrange(desc(value))
 head(coeff)
 tail(coeff)
 
-
-
-#D)
-
-
-# D)b)
 
 # compute tf-idf values for each of the top 100 bigrams
 tfidf <- bigram_clean %>%
@@ -239,8 +223,6 @@ train <- final %>% slice(1:split_size)
 test <- final %>% slice(split_size+1:n())
 
 
-
-#D) d)
 # new model
 new_model <- glm(circuit ~., data = train, family = "binomial")
 train$predicted.probability <- predict(new_model, train, type = "response")
@@ -256,9 +238,6 @@ head(coeff)
 tail(coeff)
 
 
-#E in pdf
-
-## F)
 
 # generate trigram data
 trigram_data <-appeals.data %>% unnest_tokens(word, text, token = "ngrams", n =3)
